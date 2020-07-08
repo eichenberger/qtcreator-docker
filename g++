@@ -1,7 +1,6 @@
 #!/bin/bash
 
 bin_dir=$(dirname $0)
-. $bin_dir/environment
 . $bin_dir/helper
 
 ARGS="$@"
