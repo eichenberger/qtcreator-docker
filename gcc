@@ -1,9 +1,10 @@
 #!/bin/bash
 
 bin_dir=$(dirname $0)
+. $bin_dir/environment
 . $bin_dir/helper
 
 ARGS="$@"
 
-# Run gcc inside the container
-docker_run "cd $PWD && gcc $ARGS"
+# Prepend sysroot to all directories under /usr... Qt uses this for syntax check with libclang
+docker_run "cd $PWD && gcc $ARGS" 2> >(sed -e "s+/usr/+$QT_SYSROOT/usr/+g" >&2)
