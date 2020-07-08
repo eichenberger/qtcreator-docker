@@ -1,0 +1,140 @@
+FROM debian:buster-slim
+
+ARG ARCH_ARG=armhf
+ARG CROSS_COMPILE_ARG="arm-linux-gnueabihf-"
+
+ENV CROSS_COMPILE=${CROSS_COMPILE_ARG}
+
+# Make sure we don't get notifications we can't answer during building.
+ENV DEBIAN_FRONTEND="noninteractive"
+
+RUN dpkg --add-architecture ${ARCH_ARG}
+
+# Install required packages
+RUN apt-get -q -y update \
+    && apt-get -q -y install \
+    crossbuild-essential-${ARCH_ARG} \
+    qt5-qmake:${ARCH_ARG} \
+    && apt-get clean \
+    && apt-get autoremove \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get -q -y update \
+    && apt-get -q -y install \
+    libaccounts-qt5-dev:${ARCH_ARG} \
+    libdbusextended-qt5-dev:${ARCH_ARG} \
+    libdbusmenu-qt5-dev:${ARCH_ARG} \
+    libfcitx-qt5-dev:${ARCH_ARG} \
+    libgrantlee5-dev:${ARCH_ARG} \
+    libgwengui-qt5-dev:${ARCH_ARG} \
+    libjreen-qt5-dev:${ARCH_ARG} \
+    liblastfm5-dev:${ARCH_ARG} \
+    libmpris-qt5-dev:${ARCH_ARG} \
+    libodsstream-qt5-dev:${ARCH_ARG} \
+    libpackagekitqt5-dev:${ARCH_ARG} \
+    libphonon4qt5-dev:${ARCH_ARG} \
+    libpoppler-qt5-dev:${ARCH_ARG} \
+    libqaccessibilityclient-qt5-dev:${ARCH_ARG} \
+    libqjdns-qt5-dev:${ARCH_ARG} \
+    libqscintilla2-qt5-dev:${ARCH_ARG} \
+    libqt5charts5-dev:${ARCH_ARG} \
+    libqt5datavisualization5-dev:${ARCH_ARG} \
+    libqt5gamepad5-dev:${ARCH_ARG} \
+    libqt5networkauth5-dev:${ARCH_ARG} \
+    libqt5opengl5-dev:${ARCH_ARG} \
+    libqt5sensors5-dev:${ARCH_ARG} \
+    libqt5serialbus5-dev:${ARCH_ARG} \
+    libqt5serialport5-dev:${ARCH_ARG} \
+    libqt5svg5-dev:${ARCH_ARG} \
+    libqt5texttospeech5-dev:${ARCH_ARG} \
+    libqt5waylandclient5-dev:${ARCH_ARG} \
+    libqt5waylandcompositor5-dev:${ARCH_ARG} \
+    libqt5webchannel5-dev:${ARCH_ARG} \
+    libqt5webkit5-dev:${ARCH_ARG} \
+    libqt5websockets5-dev:${ARCH_ARG} \
+    libqt5webview5-dev:${ARCH_ARG} \
+    libqt5x11extras5-dev:${ARCH_ARG} \
+    libqt5xmlpatterns5-dev:${ARCH_ARG} \
+    libqtspell-qt5-dev:${ARCH_ARG} \
+    libquazip5-dev:${ARCH_ARG} \
+    libqwt-qt5-dev:${ARCH_ARG} \
+    libqwtmathml-qt5-dev:${ARCH_ARG} \
+    libsignon-qt5-dev:${ARCH_ARG} \
+    libtelepathy-qt5-dev:${ARCH_ARG} \
+    pyqt5-dev:${ARCH_ARG} \
+    pyqt5-dev-tools:${ARCH_ARG} \
+    qt3d5-dev:${ARCH_ARG} \
+    qt3d5-dev-tools:${ARCH_ARG} \
+    qtbase5-dev:${ARCH_ARG} \
+    qtbase5-dev-tools:${ARCH_ARG} \
+    qtconnectivity5-dev:${ARCH_ARG} \
+    qtdeclarative5-dev:${ARCH_ARG} \
+    qtdeclarative5-dev-tools:${ARCH_ARG} \
+    qtlocation5-dev:${ARCH_ARG} \
+    qtmultimedia5-dev:${ARCH_ARG} \
+    qtpositioning5-dev:${ARCH_ARG} \
+    qtquickcontrols2-5-dev:${ARCH_ARG} \
+    qtscript5-dev:${ARCH_ARG} \
+    qttools5-dev:${ARCH_ARG} \
+    qttools5-dev-tools:${ARCH_ARG} \
+    qtwayland5-dev-tools:${ARCH_ARG} \
+    qtwebengine5-dev:${ARCH_ARG} \
+    qtwebengine5-dev-tools:${ARCH_ARG} \
+    qtxmlpatterns5-dev-tools:${ARCH_ARG} \
+    \
+    qtbase5-dev:${ARCH_ARG} \
+    qtwayland5:${ARCH_ARG} \
+    libqt5websockets5-dev:${ARCH_ARG} \
+    qtdeclarative5-dev:${ARCH_ARG} \
+    qtdeclarative5-dev:${ARCH_ARG} \
+    qt3d5-dev:${ARCH_ARG} \
+    libqt5serialport5-dev:${ARCH_ARG} \
+    qtquickcontrols2-5-dev:${ARCH_ARG} \
+    qml-module-qtquick2:${ARCH_ARG} \
+    qml-module-qtquick-controls2:${ARCH_ARG} \
+    qml-module-qt-websockets:${ARCH_ARG} \
+    qml-module-qt3d:${ARCH_ARG} \
+    qml-module-qtaudioengine:${ARCH_ARG} \
+    qml-module-qtav:${ARCH_ARG} \
+    qml-module-qtbluetooth:${ARCH_ARG} \
+    qml-module-qtcharts:${ARCH_ARG} \
+    qml-module-qtdatavisualization:${ARCH_ARG} \
+    qml-module-qtgraphicaleffects:${ARCH_ARG} \
+    qml-module-qtgstreamer:${ARCH_ARG} \
+    qml-module-qtlocation:${ARCH_ARG} \
+    qml-module-qtmultimedia:${ARCH_ARG} \
+    qml-module-qtnfc:${ARCH_ARG} \
+    qml-module-qtpositioning:${ARCH_ARG} \
+    qml-module-qtqml-models2:${ARCH_ARG} \
+    qml-module-qtqml-statemachine:${ARCH_ARG} \
+    qml-module-qtquick-controls:${ARCH_ARG} \
+    qml-module-qtquick-controls2:${ARCH_ARG} \
+    qml-module-qtquick-dialogs:${ARCH_ARG} \
+    qml-module-qtquick-extras:${ARCH_ARG} \
+    qml-module-qtquick-layouts:${ARCH_ARG} \
+    qml-module-qtquick-localstorage:${ARCH_ARG} \
+    qml-module-qtquick-particles2:${ARCH_ARG} \
+    qml-module-qtquick-privatewidgets:${ARCH_ARG} \
+    qml-module-qtquick-scene2d:${ARCH_ARG} \
+    qml-module-qtquick-scene3d:${ARCH_ARG} \
+    qml-module-qtquick-shapes:${ARCH_ARG} \
+    qml-module-qtquick-templates2:${ARCH_ARG} \
+    qml-module-qtquick-virtualkeyboard:${ARCH_ARG} \
+    qml-module-qtquick-window2:${ARCH_ARG} \
+    qml-module-qtquick-xmllistmodel:${ARCH_ARG} \
+    qml-module-qtquick2:${ARCH_ARG} \
+    qml-module-qtsensors:${ARCH_ARG} \
+    qml-module-qttest:${ARCH_ARG} \
+    qml-module-qtwayland-compositor:${ARCH_ARG} \
+    qml-module-qtwebchannel:${ARCH_ARG} \
+    qml-module-qtwebengine:${ARCH_ARG} \
+    qml-module-qtwebkit:${ARCH_ARG} \
+    qml-module-qtwebsockets:${ARCH_ARG} \
+    qml-module-qtwebview:${ARCH_ARG} \
+    \
+    qmlscene:${ARCH_ARG} \
+    && apt-get clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*
+
+# Make sure that the right objcopy will be called
+RUN cross_arg=$(echo ${CROSS_COMPILE_ARG} | sed 's/-$//g') \
+    && echo QMAKE_OBJCOPY=${CROSS_COMPILE_ARG}objcopy >> /usr/lib/$cross_arg/qt5/mkspecs/linux-g++/qmake.conf
