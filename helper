@@ -1,0 +1,14 @@
+bin_dir=$(dirname $0)
+. $bin_dir/environment
+
+docker_run() {
+    environment=$(tempfile)
+    env | grep -v PATH >> $environment
+    # Hack for iMX8 devices
+    echo ACCEPT_FSL_EULA=1 >> $environment
+
+    # Run the command in a container
+    docker run --rm --env-file $environment -v $PROJECT_DIR:$PROJECT_DIR $DOCKER_IMAGE /bin/bash -c "$@"
+    rm $environment
+}
+

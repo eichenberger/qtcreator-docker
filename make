@@ -1,0 +1,9 @@
+#!/bin/bash
+
+bin_dir=$(dirname $0)
+. $bin_dir/helper
+
+ARGS="$@"
+
+# Run make inside the container
+docker_run "cd $PWD && make $ARGS"

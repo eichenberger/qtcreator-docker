@@ -1,0 +1,10 @@
+#!/bin/bash
+
+bin_dir=$(dirname $0)
+. $bin_dir/helper
+
+ARGS="$@"
+
+# Run g++ inside the container
+docker_run "cd $PWD && g++ $ARGS"
+

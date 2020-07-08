@@ -1,0 +1,22 @@
+#!/bin/bash
+
+usage() {
+  echo "docker-export-image <path to export dir>"
+  echo
+  echo "Will export the rootfs of the development container to the export directory"
+}
+
+bin_dir=$(dirname $0)
+. $bin_dir/environment
+
+test "$1" == "" && { usage; exit 1; }
+test -d $1 || { usage; exit 1; }
+
+container_name=dev$(echo $RANDOM)
+
+# Run a container just to allow exporting
+docker run --name=$container_name --rm -d -ti -e ACCEPT_FSL_EULA=1 -v $PROJECT_DIR:$PROJECT_DIR $DOCKER_IMAGE /bin/bash
+# Export container
+docker export $container_name | tar -x -C $1
+# Stop exported container again
+docker stop $container_name

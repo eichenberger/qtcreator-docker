@@ -1,0 +1,43 @@
+#!/bin/bash
+
+bin_dir=$(dirname $0)
+. $bin_dir/environment
+
+
+environment=$(tempfile)
+env | grep -v PATH >> $environment
+echo ACCEPT_FSL_EULA=1 >> $environment
+
+ARGS="$@"
+
+# Fix the paths if you run qmake -query. This is done by qtcreator for finding the include and lib directories which are then used by libclang for syntax check.
+# Also fix the QMAKE_OBJCOPY which is used by qmake when run from Qt Creator
+if [ "$1" == "-query" ]; then
+  for line in $(docker run --rm --env-file $environment -v $PWD:$PWD $DOCKER_IMAGE /bin/bash -c "cd $PWD && echo QMAKE_OBJCOPY=arm-linux-gnueabihf-objcopy >> /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf && $QMAKE $ARGS" 2>/dev/null); do
+    line=$(echo $line | sed -e "s+QT_HOST_BINS:.*+QT_HOST_BINS:$bin_dir+g")
+    line=$(echo $line | sed -e "s+QT_HOST_DATA:+QT_HOST_DATA:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_HOST_LIBS:+QT_HOST_LIBS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_HOST_PREFIX:+QT_HOST_PREFIX:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_ARCHDATA:+QT_INSTALL_ARCHDATA:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_BINS:+QT_INSTALL_BINS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_CONFIGURATION:+QT_INSTALL_CONFIGURATION:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_DATA:+QT_INSTALL_DATA:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_DEMOS:+QT_INSTALL_DEMOS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_DOCS:+QT_INSTALL_DOCS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_EXAMPLES:+QT_INSTALL_EXAMPLES:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_HEADERS:+QT_INSTALL_HEADERS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_IMPORTS:+QT_INSTALL_IMPORTS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_LIBEXECS:+QT_INSTALL_LIBEXECS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_LIBS:+QT_INSTALL_LIBS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_PLUGINS:+QT_INSTALL_PLUGINS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_PREFIX:+QT_INSTALL_PREFIX:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_QML:+QT_INSTALL_QML:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_TESTS:+QT_INSTALL_TESTS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_INSTALL_TRANSLATIONS:+QT_INSTALL_TRANSLATIONS:$QT_SYSROOT+g")
+    line=$(echo $line | sed -e "s+QT_SYSROOT:+QT_SYSROOT:$QT_SYSROOT+g")
+    echo $line
+  done
+else
+  docker run --rm --env-file $environment -v $PROJECT_DIR:$PROJECT_DIR $DOCKER_IMAGE /bin/bash -c "cd $PWD && echo QMAKE_OBJCOPY=arm-linux-gnueabihf-objcopy >> /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf && $QMAKE $ARGS" > >(tee -a /tmp/qmake-output) 2> >(tee -a /tmp/qmake-stderr >&2)
+fi
+rm $environment

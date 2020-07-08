@@ -1,0 +1,8 @@
+# Sysroot where the rootfs of the development container is exported
+QT_SYSROOT="/home/stefan/projects/torizon/qt-dev"
+# The name of the docker image for developement
+export DOCKER_IMAGE=qt5-dev
+# The project directory which is mounted into the Docker container. Can also be more than just the project directory (for example whole home).
+export PROJECT_DIR=$HOME
+# Which qmake should be used inside the container (arch specific!)
+QMAKE="/usr/bin/arm-linux-gnueabihf-qmake"
