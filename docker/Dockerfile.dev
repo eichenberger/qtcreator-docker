@@ -1,6 +1,8 @@
 FROM debian:buster-slim
 
+# ARCH_ARG can also be arm64
 ARG ARCH_ARG=armhf
+# CROSS_COMPILE_ARG can also be aarch64-linux-gnu-
 ARG CROSS_COMPILE_ARG="arm-linux-gnueabihf-"
 
 ENV CROSS_COMPILE=${CROSS_COMPILE_ARG}
@@ -61,8 +63,6 @@ RUN apt-get -q -y update \
     libqwtmathml-qt5-dev:${ARCH_ARG} \
     libsignon-qt5-dev:${ARCH_ARG} \
     libtelepathy-qt5-dev:${ARCH_ARG} \
-    pyqt5-dev:${ARCH_ARG} \
-    pyqt5-dev-tools:${ARCH_ARG} \
     qt3d5-dev:${ARCH_ARG} \
     qt3d5-dev-tools:${ARCH_ARG} \
     qtbase5-dev:${ARCH_ARG} \
@@ -134,6 +134,9 @@ RUN apt-get -q -y update \
     \
     qmlscene:${ARCH_ARG} \
     && apt-get clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*
+
+# Overwrite qt_lib_gui by setting opengles2 instead of opengl flags
+COPY qt_lib_gui.pri /usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri
 
 # Make sure that the right objcopy will be called
 RUN cross_arg=$(echo ${CROSS_COMPILE_ARG} | sed 's/-$//g') \
