@@ -4,5 +4,6 @@ QT_SYSROOT="/home/stefan/projects/torizon/qt-dev"
 export DOCKER_IMAGE=qt5-dev
 # The project directory which is mounted into the Docker container. Can also be more than just the project directory (for example whole home).
 export PROJECT_DIR=$HOME
-# Which qmake should be used inside the container (arch specific!)
-QMAKE="/usr/bin/arm-linux-gnueabihf-qmake"
+# Which qmake should be used inside the container (arch specific armhf 32 bit, aarch64 64 bit)
+#QMAKE="/usr/bin/arm-linux-gnueabihf-qmake"
+QMAKE="/usr/bin/aarch64-linux-gnu-qmake"

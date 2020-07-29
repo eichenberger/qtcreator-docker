@@ -8,7 +8,7 @@ ARGS="$@"
 # Fix the paths if you run qmake -query. This is done by qtcreator for finding the include and lib directories which are then used by libclang for syntax check.
 # Also fix the QMAKE_OBJCOPY which is used by qmake when run from Qt Creator
 if [ "$1" == "-query" ]; then
-  for line in $(docker_run "cd $PWD && echo QMAKE_OBJCOPY=arm-linux-gnueabihf-objcopy >> /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf && $QMAKE $ARGS" 2>/dev/null); do
+  for line in $(docker_run "cd $PWD && $QMAKE $ARGS" 2>/dev/null); do
     line=$(echo $line | sed -e "s+QT_HOST_BINS:.*+QT_HOST_BINS:$bin_dir+g")
     line=$(echo $line | sed -e "s+QT_HOST_DATA:+QT_HOST_DATA:$QT_SYSROOT+g")
     line=$(echo $line | sed -e "s+QT_HOST_LIBS:+QT_HOST_LIBS:$QT_SYSROOT+g")
@@ -33,5 +33,5 @@ if [ "$1" == "-query" ]; then
     echo $line
   done
 else
-  docker_run "cd $PWD && echo QMAKE_OBJCOPY=arm-linux-gnueabihf-objcopy >> /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf && $QMAKE $ARGS"
+  docker_run "cd $PWD && $QMAKE $ARGS"
 fi

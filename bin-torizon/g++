@@ -6,5 +6,4 @@ bin_dir=$(dirname $0)
 ARGS="$@"
 
 # Prepend sysroot to all directories under /usr... Qt uses this for syntax check with libclang
-docker_run "cd $PWD && g++ $ARGS" 2> >(sed -e "s+/usr/+$QT_SYSROOT/usr/+g" >&2)
-
+docker_run "cd $PWD && \${CROSS_COMPILE}g++ $ARGS" 2> >(sed -e "s+/usr/+$QT_SYSROOT/usr/+g" >&2)
