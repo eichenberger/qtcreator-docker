@@ -1,26 +1,20 @@
-FROM debian:buster-slim
-
-# ARCH_ARG can also be arm64
 ARG ARCH_ARG=armhf
-# CROSS_COMPILE_ARG can also be aarch64-linux-gnu-
-ARG CROSS_COMPILE_ARG="arm-linux-gnueabihf-"
+FROM torizon/debian-cross-toolchain-$ARCH_ARG
+# We also need the ARCH_ARG in the first build stage
+ARG ARCH_ARG=armhf
 
-ENV CROSS_COMPILE=${CROSS_COMPILE_ARG}
-
-# Make sure we don't get notifications we can't answer during building.
-ENV DEBIAN_FRONTEND="noninteractive"
-
-RUN dpkg --add-architecture ${ARCH_ARG}
+# Remove Toradex feeds for now because of broken qt5 dependencies on iMX8
+RUN sed -i 's/\(.*\)feeds.toradex.com\(.*\)/# \1feeds.toradex.com\2/g' /etc/apt/sources.list
 
 # Install required packages
 RUN apt-get -q -y update \
     && apt-get -q -y install \
-    crossbuild-essential-${ARCH_ARG} \
     qt5-qmake:${ARCH_ARG} \
     && apt-get clean \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/*
 
+# Install almost all available qt packages. This make the development container more general purpose.
 RUN apt-get -q -y update \
     && apt-get -q -y install \
     libaccounts-qt5-dev:${ARCH_ARG} \
@@ -139,5 +133,5 @@ RUN apt-get -q -y update \
 COPY qt_lib_gui.pri /usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri
 
 # Make sure that the right objcopy will be called
-RUN cross_arg=$(echo ${CROSS_COMPILE_ARG} | sed 's/-$//g') \
-    && echo QMAKE_OBJCOPY=${CROSS_COMPILE_ARG}objcopy >> /usr/lib/$cross_arg/qt5/mkspecs/linux-g++/qmake.conf
+RUN cross_arg=$(echo ${CROSS_COMPILE} | sed 's/-$//g') \
+    && echo QMAKE_OBJCOPY=${CROSS_COMPILE}objcopy >> /usr/lib/$cross_arg/qt5/mkspecs/linux-g++/qmake.conf

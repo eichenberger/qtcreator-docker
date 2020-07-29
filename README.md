@@ -14,3 +14,9 @@ Directory which contains two docker files.
 
 Dockerfile: The Dockerfile which creates an image which should run on the target
 Dockerfile.dev: A Dockerfile which creates an image which can be used to cross compile
+
+To build for arm32 use:
+docker build -f Dockerfile.dev -t qt-dev .
+
+To build for arm64 use:
+docker build -f Dockerfile.dev --build-arg ARCH\_ARG=arm64 -t qt-dev .
