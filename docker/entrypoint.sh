@@ -1,5 +1,5 @@
 #!/bin/bash
 
 mkdir /run/sshd && /usr/sbin/sshd
-mkdir -p /tmp/.X11-unix
+env > /etc/environment
 /bin/bash $@
