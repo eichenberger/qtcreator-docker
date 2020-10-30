@@ -1,15 +1,21 @@
-ARG ARCH_ARG=armhf
-FROM torizon/debian-cross-toolchain-$ARCH_ARG
+FROM debian:bullseye
 # We also need the ARCH_ARG in the first build stage
 ARG ARCH_ARG=armhf
+ARG CROSS_COMPILE_ARG="arm-linux-gnueabihf"
 ARG USER_ID_ARG=1000
 
-# Remove Toradex feeds for now because of broken qt5 dependencies on iMX8
-RUN sed -i 's/\(.*\)feeds.toradex.com\(.*\)/# \1feeds.toradex.com\2/g' /etc/apt/sources.list
+ENV CROSS_COMPILE=${CROSS_COMPILE_ARG}-
+ENV PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/lib/${CROSS_COMPILE_ARG}/pkgconfig
+
+RUN dpkg --add-architecture ${ARCH_ARG}
+
+# Avoid configure to avoid issues with armhf
+RUN echo "APT::Immediate-Configure 0;" > /etc/apt/apt.conf.d/immediate-configure
 
 # Install required packages
 RUN apt-get -q -y update \
     && apt-get -q -y install \
+    crossbuild-essential-${ARCH_ARG} \
     qt5-qmake:${ARCH_ARG} \
     && apt-get clean \
     && apt-get autoremove \
@@ -27,7 +33,6 @@ RUN apt-get -q -y update \
     libjreen-qt5-dev:${ARCH_ARG} \
     liblastfm5-dev:${ARCH_ARG} \
     libmpris-qt5-dev:${ARCH_ARG} \
-    libodsstream-qt5-dev:${ARCH_ARG} \
     libpackagekitqt5-dev:${ARCH_ARG} \
     libphonon4qt5-dev:${ARCH_ARG} \
     libpoppler-qt5-dev:${ARCH_ARG} \
@@ -130,15 +135,10 @@ RUN apt-get -q -y update \
     qmlscene:${ARCH_ARG} \
     && apt-get clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*
 
-# Overwrite qt_lib_gui by setting opengles2 instead of opengl flags
-COPY qt_lib_gui.pri /usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri
-
 # Make sure that the right objcopy will be called
 RUN cross_arg=$(echo ${CROSS_COMPILE} | sed 's/-$//g') \
     && echo QMAKE_OBJCOPY=${CROSS_COMPILE}objcopy >> /usr/lib/$cross_arg/qt5/mkspecs/linux-g++/qmake.conf
 
-# Remove torizon if it exists and replace it with a build user with the same ID as the host user
-RUN userdel torizon | true
 # Add a group which has the same gid as the customers uid
 RUN groupadd -g ${USER_ID_ARG} build
 # Add a user with the uid from the args

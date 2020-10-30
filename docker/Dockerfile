@@ -1,5 +1,6 @@
-ARG BASE_NAME=arm32v7-debian-qt5-wayland
-FROM torizon/$BASE_NAME:buster
+ARG BASE_NAME=qt5-wayland
+ARG TAG=2
+FROM torizon/${BASE_NAME}:${TAG}
 
 SHELL ["/bin/bash", "-c"]
 
@@ -46,8 +47,6 @@ RUN sed -i 's/nullok_secure/nullok/g' /etc/pam.d/common-auth && \
     echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config && \
     echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
     sed -i /etc/shadow -e 's/root:.*/root::18254:0:99999:7:::/g'
-
-RUN test $(arch) == "aarch64" && { cd /usr/lib/aarch64-linux-gnu/ && ln -s libGL.so.1.7.0 libGL.so.1.2; } || true
 
 COPY entrypoint.sh /entrypoint.sh
 
