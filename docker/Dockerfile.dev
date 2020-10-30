@@ -137,8 +137,8 @@ COPY qt_lib_gui.pri /usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pr
 RUN cross_arg=$(echo ${CROSS_COMPILE} | sed 's/-$//g') \
     && echo QMAKE_OBJCOPY=${CROSS_COMPILE}objcopy >> /usr/lib/$cross_arg/qt5/mkspecs/linux-g++/qmake.conf
 
-# Remove torizon and replace it with a build user with the same ID as the host user
-RUN userdel torizon
+# Remove torizon if it exists and replace it with a build user with the same ID as the host user
+RUN userdel torizon | true
 # Add a group which has the same gid as the customers uid
 RUN groupadd -g ${USER_ID_ARG} build
 # Add a user with the uid from the args
